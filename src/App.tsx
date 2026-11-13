@@ -351,7 +351,8 @@ export default function App() {
         }
       }
 
-      const sensor = new window.Magnetometer({ frequency: 30 });
+      // Gunakan frekuensi rendah (10 Hz) agar tidak ditolak oleh batasan hardware/OS Android (mencegah NotReadableError)
+      const sensor = new window.Magnetometer({ frequency: 10 });
       magSensorRef.current = sensor;
 
       sensor.onactivate = () => {
@@ -381,29 +382,56 @@ export default function App() {
       };
 
       sensor.onerror = (event: SensorErrorEvent) => {
-        if (event.error.name === 'NotAllowedError') {
+        if (event.error.name === 'NotAllowedError' || event.error.name === 'SecurityError') {
           setSensorStatus((prev) => ({ ...prev, magnetometer: 'DENIED' }));
           addErrorNotification(
-            'IZIN MAGNETOMETER DITOLAK (NotAllowedError): Akses ke sensor Magnetometer diblokir oleh pengguna atau kebijakan browser.'
+            `IZIN MAGNETOMETER DITOLAK (${event.error.name}): Akses ke sensor Magnetometer diblokir oleh pengguna atau kebijakan browser.`
           );
         } else if (event.error.name === 'NotReadableError') {
           setSensorStatus((prev) => ({ ...prev, magnetometer: 'UNSUPPORTED' }));
           addErrorNotification(
-            'HARDWARE SENSOR ERROR (NotReadableError): Sensor Magnetometer pada perangkat tidak dapat dibaca. Mengaktifkan Mode Simulasi Kalibrasi.'
+            'HARDWARE SENSOR ERROR (NotReadableError): Sensor Magnetometer tidak dapat dibaca pada frekuensi/driver saat ini. Mengaktifkan Mode Simulasi Kalibrasi.'
           );
           startFieldSimulation();
         } else {
           setSensorStatus((prev) => ({ ...prev, magnetometer: 'UNSUPPORTED' }));
           addErrorNotification(`MAGNETOMETER ERROR (${event.error.name}): ${event.error.message}`);
+          startFieldSimulation();
         }
       };
 
-      sensor.start();
+      // Blok try-catch khusus & kuat saat mengeksekusi sensor.start()
+      try {
+        sensor.start();
+      } catch (startErr) {
+        const errName = startErr instanceof DOMException ? startErr.name : 'StartError';
+        const errMsg = startErr instanceof Error ? startErr.message : String(startErr);
+
+        if (errName === 'SecurityError' || errName === 'NotAllowedError') {
+          setSensorStatus((prev) => ({ ...prev, magnetometer: 'DENIED' }));
+          addErrorNotification(
+            `GAGAL MENJALANKAN SENSOR (${errName}): Kebijakan izin (Permissions-Policy / Pengguna) menolak eksekusi sensor.start() — ${errMsg}`
+          );
+        } else if (errName === 'NotReadableError') {
+          setSensorStatus((prev) => ({ ...prev, magnetometer: 'UNSUPPORTED' }));
+          addErrorNotification(
+            `HARDWARE MENOLAK START SENSOR (NotReadableError): ${errMsg}. Beralih ke Mode Simulasi Taktis.`
+          );
+          startFieldSimulation();
+        } else {
+          setSensorStatus((prev) => ({ ...prev, magnetometer: 'UNSUPPORTED' }));
+          addErrorNotification(
+            `EKSEKUSI sensor.start() GAGAL (${errName}): ${errMsg}. Beralih ke Mode Simulasi Taktis.`
+          );
+          startFieldSimulation();
+        }
+      }
     } catch (err) {
+      const errName = err instanceof DOMException ? err.name : 'InitError';
       const message = err instanceof Error ? err.message : String(err);
       setSensorStatus((prev) => ({ ...prev, magnetometer: 'UNSUPPORTED' }));
       addErrorNotification(
-        `INISIALISASI MAGNETOMETER GAGAL: ${message}. Pastikan Generic Sensor API diizinkan.`
+        `INISIALISASI MAGNETOMETER GAGAL (${errName}): ${message}. Pastikan Generic Sensor API diizinkan.`
       );
       startFieldSimulation();
     }
