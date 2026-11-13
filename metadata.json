@@ -1,0 +1,6 @@
+{
+  "name": "TACTICAL AR MAGNETIC SWEEPER - DISKOMLEKAU",
+  "description": "Progressive Web App (PWA) pendeteksi anomali logam dan medan magnet di balik tembok menggunakan sensor Magnetometer, Gyroscope, dan Augmented Reality Heatmap 2D/3D.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

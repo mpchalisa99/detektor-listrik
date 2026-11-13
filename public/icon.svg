@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="96" fill="#060B14" />
+  <rect x="24" y="24" width="464" height="464" rx="76" stroke="#0EA5E9" stroke-opacity="0.25" stroke-width="4" />
+  <!-- Radar Concentric Rings -->
+  <circle cx="256" cy="256" r="176" stroke="#1E293B" stroke-width="4" />
+  <circle cx="256" cy="256" r="124" stroke="#0EA5E9" stroke-opacity="0.4" stroke-width="3" stroke-dasharray="10 8" />
+  <circle cx="256" cy="256" r="68" stroke="#10B981" stroke-opacity="0.6" stroke-width="3" />
+  <!-- Crosshairs -->
+  <line x1="256" y1="56" x2="256" y2="456" stroke="#0EA5E9" stroke-opacity="0.35" stroke-width="3" />
+  <line x1="56" y1="256" x2="456" y2="256" stroke="#0EA5E9" stroke-opacity="0.35" stroke-width="3" />
+  <!-- Magnetic Field Arcs -->
+  <path d="M168 188C124 226 124 286 168 324" stroke="#F59E0B" stroke-width="10" stroke-linecap="round" />
+  <path d="M344 188C388 226 388 286 344 324" stroke="#EF4444" stroke-width="10" stroke-linecap="round" />
+  <!-- Anomaly Target Lock -->
+  <circle cx="310" cy="202" r="24" fill="#EF4444" fill-opacity="0.3" stroke="#EF4444" stroke-width="5" />
+  <circle cx="310" cy="202" r="8" fill="#EF4444" />
+  <!-- Center Core -->
+  <circle cx="256" cy="256" r="14" fill="#06B6D4" />
+</svg>
